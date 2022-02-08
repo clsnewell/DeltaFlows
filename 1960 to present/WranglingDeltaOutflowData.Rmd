@@ -18,7 +18,9 @@ library(lubridate)
 library(ggplot2)
 #library(lfstat)
 #install_github("ChandlerLutz/ggts")
+```
 
+```
 dayflow_results_1956_1969 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1956-1969.csv")
 dayflow_results_1970_1983 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1970-1983.csv")
 dayflow_results_1984_1996 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1984-1996.csv")
