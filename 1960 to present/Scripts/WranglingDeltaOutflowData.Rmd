@@ -16,11 +16,13 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
-#library(lfstat)
+library(lfstat)
 #install_github("ChandlerLutz/ggts")
 ```
 
-```
+#Reading al of the data in, formatting, writing
+
+```{r}
 dayflow_results_1956_1969 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1956-1969.csv")
 dayflow_results_1970_1983 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1970-1983.csv")
 dayflow_results_1984_1996 <- read_csv("C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/dayflow-results-1984-1996.csv")
@@ -76,7 +78,7 @@ DeltaFlow1960_2021<- DeltaFlow1956_2021 %>% filter(Date >="1959-10-01")
 write.csv(DeltaFlow1960_2021, "C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/DeltaFlow_WaterYears1960_2021.csv")
 ```
 
-Now we plot
+# Now we plot
 ```{r}
 #basic bubble plots
 ggplot(DeltaFlow1960_2021, aes(x=Date, y=TOT)) +
@@ -124,7 +126,7 @@ DeltaFlow1960_2021_WaterYear<-df %>% group_by(WaterYear) %>% summarise(Exports_M
 
 DeltaFlow1960_2021_WaterYear$WaterYear<- as.Date(as.character(DeltaFlow1960_2021_WaterYear$WaterYear), format="%Y")
 
-drought_years<-c(1976, 1977, 1987, 1988, 1989, 1990, 1991, 1992, 2007, 2008, 2009, 2012, 2013, 2014, 2015, 2016) #data from: https://water.ca.gov/water-basics/drought
+drought_years<-c(1976, 1977, 1987, 1988, 1989, 1990, 1991, 1992, 2007, 2008, 2009, 2012, 2013, 2014, 2015, 2016, 2020, 2021) #data from: https://water.ca.gov/water-basics/drought  and Peter (2020, 2021)
 
 ggplot(DeltaFlow1960_2021_WaterYear, aes(x=WaterYear))+
   geom_bar(aes(y=TOT_MAF), stat="identity", color="black", fill="steelblue")+
