@@ -35,37 +35,31 @@ Now I need to join all of the data together into one dataframe.
 ```{r}
 #str(dayflowcalculations2021$Date)
 #dayflowcalculations2021$Date<-mdy(dayflowcalculations2021$Date) #This deletes values for some reason, and date data appears to be correct already... so i'm gonna leave it.
-                                               dayflow_results_1997_2020$Date<-mdy(dayflow_results_1997_2020$Date)
 
-#str(dayflow_results_1984_1996) #Date is saved as a character, but when i do as.date it changes the value completely...                                                                                             
+dayflow_results_1997_2020$Date<-mdy(dayflow_results_1997_2020$Date)
+#str(dayflow_results_1984_1996) #Date is saved as a character, but when i do as.date it changes the value completely...                     
 dayflow_results_1984_1996$Date<-mdy(dayflow_results_1984_1996$Date)
 #str(dayflow_results_1984_1996$Date)
-                                                  dayflow_results_1970_1983$Date<- mdy(dayflow_results_1970_1983$Date)
-                                                    dayflow_results_1956_1969$Date<- mdy(dayflow_results_1956_1969$Date)
+dayflow_results_1970_1983$Date<- mdy(dayflow_results_1970_1983$Date)
+dayflow_results_1956_1969$Date<- mdy(dayflow_results_1956_1969$Date)
                                                     
 #Need to pull out only relevant columns since all columns don't match between data sets. 
-
-dayflowcalculations2021_subset<- dayflowcalculations2021[ , c('Date', 'TOT', 'EXPORTS', 'OUT')]  #how to subset with base r                                                  
+dayflowcalculations2021_subset<- dayflowcalculations2021[ , c('Date', 'TOT', 'EXPORTS', 'OUT')]  #how to subset with base r   
 dayflow_results_1997_2020_subset<-dayflow_results_1997_2020 %>% select(Date, TOT, EXPORTS, OUT) #how to subset using tidyverse
-
 dayflow_results_1984_1996_subset<-dayflow_results_1984_1996 %>% select(Date, TOT, EXPORT, OUT)
 #need to rename EXPORT -> EXPORTS
 dayflow_results_1984_1996_subset<-dayflow_results_1984_1996_subset %>% rename(EXPORTS = EXPORT)
 str(dayflow_results_1984_1996_subset)
-
 dayflow_results_1970_1983_subset<-dayflow_results_1970_1983 %>% select(Date, TOT, EXPORT, OUT)
 #need to rename EXPORT -> EXPORTS
 dayflow_results_1970_1983_subset<- dayflow_results_1970_1983_subset %>% rename(EXPORTS = EXPORT)
 str(dayflow_results_1970_1983_subset)
-
 dayflow_results_1956_1969_subset<- dayflow_results_1956_1969 %>% select(Date, TOT, EXPORT, OUT)
 #need to rename EXPORT -> EXPORTS
 dayflow_results_1956_1969_subset<-dayflow_results_1956_1969_subset %>% rename(EXPORTS = EXPORT)
 
 #okay, now I think we are ready to bind!
-
 DeltaFlow1956_2021<- bind_rows(dayflow_results_1956_1969_subset, dayflow_results_1970_1983_subset, dayflow_results_1984_1996_subset, dayflow_results_1997_2020_subset, dayflowcalculations2021_subset)
-
 #View(DeltaFlow1956_2021) #Dopenessss
 str(DeltaFlow1956_2021)
 ```
@@ -74,7 +68,22 @@ str(DeltaFlow1956_2021)
 #Now I only want WATER YEAR 1960 through 2021.
 DeltaFlow1960_2021<- DeltaFlow1956_2021 %>% filter(Date >="1959-10-01")
 #View(DeltaFlow1960_2021)
-#Save that shit!
-write.csv(DeltaFlow1960_2021, "C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/DeltaFlow_WaterYears1960_2021.csv")
+#Save that!
+write.csv(DeltaFlow1960_2021, "C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/DeltaFlow_1960_2021.csv")
 ```
 
+```{r}
+#sum by water year
+df <- DeltaFlow_1960_2021 %>% mutate(WaterYear = water_year(Date, origin = "usgs")) #That was so easy! Crying.
+#Here is the code info for what I ran/how I did that: https://www.rdocumentation.org/packages/lfstat/versions/0.9.4/topics/water_year
+
+DeltaFlow1960_2021_WaterYear<-df %>% group_by(WaterYear) %>% summarise(Exports_MAF = sum(EXPORTS*1.983)/1000000, TOT_MAF = sum(TOT*1.983)/1000000) #24 hours at 1 cfs  = 1.983 acre feet
+
+DeltaFlow1960_2021_WaterYear$WaterYear<- as.Date(as.character(DeltaFlow1960_2021_WaterYear$WaterYear), format="%Y")
+
+drought_years<-c(1976, 1977, 1987, 1988, 1989, 1990, 1991, 1992, 2007, 2008, 2009, 2012, 2013, 2014, 2015, 2016, 2020, 2021) #data from: https://water.ca.gov/water-basics/drought  and Peter (2020, 2021)
+DeltaFlow1960_2021_WaterYear$WaterYear <- lubridate::year(DeltaFlow1960_2021_WaterYear$WaterYear)
+
+write.csv(DeltaFlow1960_2021_WaterYear, "C:/Users/cnewe/OneDrive/Documents/Delta Inflow Outflow/1960 to present/data/DeltaFlow_WaterYears1960_2021.csv")
+
+```
